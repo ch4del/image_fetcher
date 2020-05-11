@@ -1,9 +1,20 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
-    authenticate :user, lambda { |u| u.admin? } do
-      mount Sidekiq::Web => '/sidekiq'
+  
+  resources :links
+  authenticate :user, lambda { |u| u.admin? } do
+    mount Sidekiq::Web => '/sidekiq'
+  end
+  
+  get "/pages/search_images" => "links#index"
+  post 'save' => 'links#save', as: :save
+  
+  resources :pages do
+    collection do
+      get :search_images
     end
+  end
 
 
   devise_for :users
